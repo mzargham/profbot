@@ -29,7 +29,3 @@ The repository is organized into several key components:
   - **`aitest.py`**: Demonstrates the process of conducting an AI exam using the `LLMTest` class.
 
 Each component of the repository plays a crucial role in facilitating the standardized testing and evaluation of LLMs, mirroring the roles found in an academic setting. This structure ensures that the framework is both flexible and robust, capable of handling a variety of testing scenarios in the context of LLM evaluation.
-
----
-
-This README provides a concise yet comprehensive guide to the purpose and structure of your repository. You can expand each section with more details as needed, especially if there are specific requirements or configurations for using the framework.
