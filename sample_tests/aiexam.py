@@ -1,4 +1,4 @@
-from exam import Exam, Schema
+from exam import Exam, GradeLog
 from dataclasses import dataclass
 from typing import List
     
@@ -17,7 +17,7 @@ exam_guidelines = [
 #print(Schema.__annotations__)
 
 # Create an instance of the Exam class using the AISchema
-ai_exam = Exam(questions, question_guidelines, exam_guidelines, Schema)
+ai_exam = Exam(questions, question_guidelines, exam_guidelines, GradeLog)
 
 
 

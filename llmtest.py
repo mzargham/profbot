@@ -1,7 +1,8 @@
 from typing import List, Type
-from exam import Exam, Schema
+from exam import Exam, GradeLog
 from os import environ
 import requests
+import re
 
 class Llm:
     def __init__(self, model_identifier: str = "gpt-4-1106-preview", 
@@ -135,12 +136,10 @@ class LLMTest:
         self.ta_llm = ta_llm
         self.exam = exam
 
-    def test(self) -> List[Type[Schema]]:
+    def test(self) -> List[Type[GradeLog]]:
         student_responses = self.student_llm.prompt_sequence(self.exam.questions)
-
         graded_responses = self.ta_llm.prompt_sequence(self.format_grading_prompt_sequence(student_responses))
-
-        standardized_responses = [self.process_ta_response(response) for response in graded_responses]
+        standardized_responses = [self.process_ta_response(self.exam.questions[i], student_responses[i], graded_responses[i+1]) for i in range(len(self.exam.questions))]
 
         return standardized_responses
 
@@ -161,9 +160,33 @@ class LLMTest:
         return sequence   
        
 
-    def process_ta_response(self, ta_response: str) -> Type[Schema]:
+    def process_ta_response(self, question, student_response, ta_response: str) -> Type[GradeLog]:
         # Process the TA's response and return it in the schema format
         # Placeholder implementation; this should be tailored to parse the actual TA's response
-        notes = "Extracted notes from TA's response"
-        grade = 100  # Dummy value; extract the actual grade from the TA's response
-        return self.exam.schema(Prompt="", Response="", Notes=notes, Grade=grade)
+        def process_string(input_str: str):
+            # Regex pattern to find 'Grade' followed by an integer
+            pattern = r"Grade: (\d+)"
+
+            # Search for the pattern in the input string
+            match = re.search(pattern, input_str)
+
+            if match:
+                # Extract the grade
+                grade = int(match.group(1))
+
+                # Cut the 'Grade' portion out of the string
+                notes = input_str.replace(match.group(0), '').strip()
+
+                return notes, grade
+            else:
+                # Return the original string and a default grade if 'Grade' not found
+                return input_str, None
+        
+        notes, grade = process_string(ta_response)
+
+        return GradeLog(TA= self.ta_llm.model_identifier,
+                                Student= self.student_llm.model_identifier,
+                                Prompt=question,
+                                Response=student_response, 
+                                Notes=notes, 
+                                Grade=grade)
