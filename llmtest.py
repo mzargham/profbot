@@ -71,6 +71,26 @@ class Llm:
             return f"{response.json()['choices'][0]['message']['content']}"
         except:
             return raw
+        
+    def prompt_sequence(self, prompts: List[str]) -> str:
+        """
+        Method to send a sequence of prompts to the LLM and return its response.
+        Each prompt in the sequence is sent as a separate message in a single request.
+        """
+        url = self.url
+        messages = [{"role": self.role, "content": prompt} for prompt in prompts]
+        
+        req = {
+            "model": self.model_identifier,
+            "messages": messages
+        }
+        print(req)
+        response = requests.post(url, json=req, headers=self.auth)  # Use json parameter to send the request payload as JSON
+        raw = response.json()
+        try:
+            return [resp['message']['content'] for resp in raw['choices']]
+        except:
+            return raw
 
 #this is still full of dummy data (but it runs!)
 class LLMTest:
