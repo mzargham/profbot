@@ -1,19 +1,23 @@
 from typing import List, Type
 from exam import Exam, Schema
-
+from os import environ
+import requests
 class Llm:
     def __init__(self, model_identifier: str):
         self.model_identifier = model_identifier
         # Initialize other necessary attributes and connect to the LLM if needed
 
-    def connect(self):
-        # Method to establish a connection to the LLM service
-        pass
-
     def prompt(self, text: str) -> str:
         # Method to send a prompt to the LLM and return its response
-        # Placeholder implementation
-        return f"Response to: {text}"
+        url = 'https://api.openai.com/v1/chat/completions'
+        req = {
+            "model": "gpt-4-1106-preview",
+            "messages":[
+                {"role": "user", "content": text}
+            ]
+        }
+        response = requests.post(url, req, headers={"Authorization": f"Bearer {environ.get('OPENAI_API_KEY')}"})
+        return f"Response to: {response.json()['choices'][0]['message']['content']}"
 
 class LLMTest:
     def __init__(self, student_llm: Llm, ta_llm: Llm, exam: Exam):
