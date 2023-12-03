@@ -1,9 +1,9 @@
-from llmtest import Llm, LLMTest
-from aiexam import ai_exam
+from .llmtest import Llm, LLMTest
+
 
 # Create instances of the Llm class for both the student and the TA
-student_llm = Llm("student_model_identifier")  # Replace with actual model identifier or configuration
-ta_llm = Llm("ta_model_identifier")           # Replace with actual model identifier or configuration
+student_llm = Llm()  # using default values
+ta_llm = Llm()      # using default values
 
 # Create an instance of the LLMTest class with the student LLM, TA LLM, and the AI exam
 llm_test = LLMTest(student_llm, ta_llm, ai_exam)

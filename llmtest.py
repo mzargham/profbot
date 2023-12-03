@@ -2,23 +2,77 @@ from typing import List, Type
 from exam import Exam, Schema
 from os import environ
 import requests
-class Llm:
-    def __init__(self, model_identifier: str):
-        self.model_identifier = model_identifier
-        # Initialize other necessary attributes and connect to the LLM if needed
 
+class Llm:
+    def __init__(self, model_identifier: str = "gpt-4-1106-preview", 
+                 url: str = "https://api.openai.com/v1/chat/completions", 
+                 role: str = "user",
+                 auth: dict = {"Authorization": f"Bearer {environ.get('OPENAI_API_KEY')}"}):
+        
+        self.model_identifier = model_identifier
+        self.url = url
+        self.role = role
+        self.auth = auth
+
+    #add setters and getters for the above attributes
+    # Getter for model_identifier
+    @property
+    def model_identifier(self):
+        return self._model_identifier
+
+    # Setter for model_identifier
+    @model_identifier.setter
+    def model_identifier(self, value):
+        self._model_identifier = value
+
+    # Getter for url
+    @property
+    def url(self):
+        return self._url
+
+    # Setter for url
+    @url.setter
+    def url(self, value):
+        self._url = value
+
+    # Getter for role
+    @property
+    def role(self):
+        return self._role
+
+    # Setter for role
+    @role.setter
+    def role(self, value):
+        self._role = value
+
+    # Getter for auth
+    @property
+    def auth(self):
+        return self._auth
+
+    # Setter for auth
+    @auth.setter
+    def auth(self, value):
+        self._auth = value
+        
     def prompt(self, text: str) -> str:
         # Method to send a prompt to the LLM and return its response
-        url = 'https://api.openai.com/v1/chat/completions'
+        url = self.url
         req = {
-            "model": "gpt-4-1106-preview",
+            "model": self.model_identifier,
             "messages":[
-                {"role": "user", "content": text}
+                {"role": self.role, "content": text}
             ]
         }
-        response = requests.post(url, req, headers={"Authorization": f"Bearer {environ.get('OPENAI_API_KEY')}"})
-        return f"Response to: {response.json()['choices'][0]['message']['content']}"
+        print(req)
+        response = requests.post(url, json=req, headers=self.auth)  # Use json parameter to send the request payload as JSON
+        raw =  response.json()
+        try:
+            return f"{response.json()['choices'][0]['message']['content']}"
+        except:
+            return raw
 
+#this is still full of dummy data (but it runs!)
 class LLMTest:
     def __init__(self, student_llm: Llm, ta_llm: Llm, exam: Exam):
         self.student_llm = student_llm
@@ -46,9 +100,3 @@ class LLMTest:
         notes = "Extracted notes from TA's response"
         grade = 100  # Dummy value; extract the actual grade from the TA's response
         return self.exam.schema(Prompt="", Response="", Notes=notes, Grade=grade)
-
-# Example usage (pseudo-code, adjust as per actual implementation)
-# student_llm = Llm("student_model_identifier")
-# ta_llm = Llm("ta_model_identifier")
-# llm_test = LLMTest(student_llm, ta_llm, some_exam_instance)
-# test_results = llm_test.test()
