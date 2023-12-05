@@ -1,6 +1,6 @@
 from exam import Exam, GradeLog
-from dataclasses import dataclass
-from typing import List
+#from dataclasses import dataclass
+#from typing import List
     
 # Define the AI exam specific questions and guidelines
 questions = ["What is AI?", "Explain deep learning."]
